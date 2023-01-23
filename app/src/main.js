@@ -1,7 +1,23 @@
 import $ from 'jquery';
 
-$.get('./api', data => {
-    data.forEach(file => {
-        $('body').append(`<h1>${file}</h1>`)
+function getPageList() {
+    $("h1").remove();
+    $.get('./api', data => {
+        data.forEach(file => {
+            $('body').append(`<h1>${file}</h1>`)
+        })
+    }, 'JSON')
+}
+
+getPageList();
+
+$('button').click(() => {
+    $.post("./api/createNewPage.php", {
+        "name": $("input").val()
+    }, () => {
+        getPageList();
     })
-}, 'JSON')
+    .fail(() => {
+        alert("Страница уже существует!");
+    })
+})
