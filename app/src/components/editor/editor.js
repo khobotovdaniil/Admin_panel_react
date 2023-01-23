@@ -26,10 +26,10 @@ export default class Editor extends Component {
     }
 
     open(page) {
-        this.currentPage = `../${page}?rnd=${Math.random()}`;
+        this.currentPage = page;
 
         axios
-            .get(`../${page}`)
+            .get(`../${page}?rnd=${Math.random()}`)
             .then(res => this.parseStrToDom(res.data))
             .then(this.wrapTextNodes)
             .then(dom => {
@@ -49,6 +49,15 @@ export default class Editor extends Component {
                 this.onTextEdit(element);
             })
         });
+    }
+
+    save() {
+        const newDom = this.virtualDom.cloneNode(this.virtualDom);
+        this.unwrapTextNodes(newDom);
+        const html = this.serializeDomToString(newDom);
+
+        axios
+            .post("./api/savePage.php", {pageName: this.currentPage, html})
     }
 
     onTextEdit(element) {
@@ -92,6 +101,12 @@ export default class Editor extends Component {
         return serializer.serializeToString(dom);
     }
 
+    unwrapTextNodes(dom) {
+        dom.body.querySelectorAll("text-editor").forEach(element => {
+            element.parentNode.replaceChild(element.firstChild, element);
+        });
+    }
+
     loadPageList() {
         axios
             .get("./api")
@@ -125,7 +140,10 @@ export default class Editor extends Component {
         // });
 
         return (
-            <iframe src={this.currentPage} frameBorder="0"></iframe>
+            <>
+                <button onClick={() => this.save()}>Save</button>
+                <iframe src={this.currentPage} frameBorder="0"></iframe>
+            </>
             // <>
             //     <input
             //         onChange={e => {this.setState({newPageName: e.target.value})}}
