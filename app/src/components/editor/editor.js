@@ -7,6 +7,8 @@ import UIkit from "uikit";
 import DOMHelper from "../../helpers/dom-helper.js";
 import EditorText from "../editor-text"
 import Spinner from "../spinner";
+import ConfirmModal from "../confirm-modal";
+import ChooseModal from "../choose-modal";
 
 export default class Editor extends Component {
     constructor() {
@@ -21,13 +23,19 @@ export default class Editor extends Component {
         this.createNewPage = this.createNewPage.bind(this);
         this.isLoading = this.isLoading.bind(this);
         this.isLoaded = this.isLoaded.bind(this);
+        this.save = this.save.bind(this);
+        this.init = this.init.bind(this);
     }
 
     componentDidMount() {
-        this.init(this.currentPage);
+        this.init(null, this.currentPage);
     }
 
-    init(page) {
+    init(e, page) {
+        if (e) {
+            e.preventDefault();
+        }
+        this.isLoading();
         this.iframe = document.querySelector('iframe');
         this.open(page, this.isLoaded);
         this.loadPageList();
@@ -46,7 +54,8 @@ export default class Editor extends Component {
             })
             .then(DOMHelper.serializeDomToString)
             .then(html => axios.post("./api/saveTempPage.php", {html}))
-            .then(() => this.iframe.load("../temp.html"))
+            .then(() => this.iframe.load("../TeMpPaGe3242.html"))
+            .then(() => axios.post("./api/deleteTempPage.php"))
             .then(() => this.enableEditing())
             .then(() => this.injectStyles())
             .then(callback)
@@ -91,7 +100,7 @@ export default class Editor extends Component {
 
     loadPageList() {
         axios
-            .get("./api")
+            .get("./api/pageList.php")
             .then(res => this.setState({pageList: res.data}));
     }
 
@@ -122,7 +131,7 @@ export default class Editor extends Component {
     }
 
     render() {
-        const {loading} = this.state;
+        const {loading, pageList} = this.state;
         const modal = true;
         let spinner;
 
@@ -135,31 +144,18 @@ export default class Editor extends Component {
                 {spinner}
 
                 <div className="panel">
-                    <button className="uk-button uk-button-primary" uk-toggle="target: #modal-save">Опубликовать</button>
+                    <button
+                        className="uk-button uk-button-primary uk-margin-small-right"
+                        uk-toggle="target: #modal-open">Открыть</button>
+                    <button
+                        className="uk-button uk-button-primary"
+                        uk-toggle="target: #modal-save">Опубликовать</button>
 
                 </div>
                 {/* <button onClick={() => this.save()}>Save</button> */}
 
-                <div id="modal-save" uk-modal={modal.toString()}>
-                    <div className="uk-modal-dialog uk-modal-body">
-                        <h2 className="uk-modal-title">Сохранение</h2>
-                        <p>Вы действительно хотите сохранить изменения?</p>
-                        <p className="uk-text-right">
-                            <button 
-                                className="uk-button uk-button-default uk-modal-close uk-modal-close"
-                                type="button">Отменить</button>
-                            <button
-                                className="uk-button uk-button-primary uk-modal-close"
-                                type="button"
-                                onClick={() => this.save(() => {
-                                    UIkit.notification({message: 'Успешно сохранено', status: 'success'})
-                                },
-                                () => {
-                                    UIkit.notification({message: 'Ошибка сохранения', status: 'danger'})
-                                })}>Опубликовать</button>
-                        </p>
-                    </div>
-                </div>
+                <ConfirmModal modal={modal} target={'modal-save'} method={this.save}/>
+                <ChooseModal modal={modal} target={'modal-open'} data={pageList} redirect={this.init}/>
             </>
         )
     }
