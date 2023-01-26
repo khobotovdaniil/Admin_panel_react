@@ -26,7 +26,7 @@ export default class EditorImages {
                         }
                     })
                     .then((res) => {
-                        this.virtualElement.src = this.element.src = `./img/Upload/${res.data.src}`;
+                        this.virtualElement.src = this.element.src = `./img_uploaded/${res.data.src}`;
                     })
                     .catch(() => this.showNotifications("Ошибка сохранения", "danger"))
                     .finally(() => {
