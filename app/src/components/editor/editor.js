@@ -81,7 +81,7 @@ export default class Editor extends Component {
             const id = element.getAttribute("editableimgid");
             const virtualElement = this.virtualDom.body.querySelector(`[editableimgid="${id}"]`);
 
-            new EditorImages(element, virtualElement);
+            new EditorImages(element, virtualElement, this.isLoading, this.isLoaded, this.showNotifications);
         });
     }
 
@@ -104,7 +104,7 @@ export default class Editor extends Component {
         this.iframe.contentDocument.head.appendChild(style);
     }
 
-    async save(onSuccess, onError) {
+    async save() {
         this.isLoading();
         const newDom = this.virtualDom.cloneNode(this.virtualDom);
         DOMHelper.unwrapTextNodes(newDom);
@@ -113,11 +113,15 @@ export default class Editor extends Component {
 
         await axios
             .post("./api/savePage.php", {pageName: this.currentPage, html})
-            .then(onSuccess)
-            .catch(onError)
+            .then(() => this.showNotifications('Успешно сохранено', 'success'))
+            .catch(() => this.showNotifications('Ошибка сохранения', 'danger'))
             .finally(this.isLoaded);
 
         this.loadBackupsList();
+    }
+
+    showNotifications(message, status) {
+        UIkit.notification({message, status});
     }
 
     loadPageList() {
