@@ -10,6 +10,7 @@ import Spinner from "../spinner";
 import ConfirmModal from "../confirm-modal";
 import ChooseModal from "../choose-modal";
 import Panel from "../panel";
+import EditorMeta from "../editor-meta";
 
 export default class Editor extends Component {
     constructor() {
@@ -22,7 +23,6 @@ export default class Editor extends Component {
             newPageName: "",
             loading: true
         }
-        // this.createNewPage = this.createNewPage.bind(this);
         this.isLoading = this.isLoading.bind(this);
         this.isLoaded = this.isLoaded.bind(this);
         this.save = this.save.bind(this);
@@ -50,13 +50,13 @@ export default class Editor extends Component {
 
         axios
             .get(`../${page}?rnd=${Math.random()}`)
-            .then(res => DOMHelper.parseStrToDom(res.data))
+            .then(res => DOMHelper.parseStrToDOM(res.data))
             .then(DOMHelper.wrapTextNodes)
             .then(dom => {
                 this.virtualDom = dom;
                 return dom;
             })
-            .then(DOMHelper.serializeDomToString)
+            .then(DOMHelper.serializeDOMToString)
             .then(html => axios.post("./api/saveTempPage.php", {html}))
             .then(() => this.iframe.load("../TeMpPaGe3242.html"))
             .then(() => axios.post("./api/deleteTempPage.php"))
@@ -95,7 +95,7 @@ export default class Editor extends Component {
         this.isLoading();
         const newDom = this.virtualDom.cloneNode(this.virtualDom);
         DOMHelper.unwrapTextNodes(newDom);
-        const html = DOMHelper.serializeDomToString(newDom);
+        const html = DOMHelper.serializeDOMToString(newDom);
 
         await axios
             .post("./api/savePage.php", {pageName: this.currentPage, html})
@@ -135,20 +135,6 @@ export default class Editor extends Component {
         })
     }
 
-    // createNewPage() {
-    //     axios
-    //         .post("./api/createNewPage.php", {"name": this.state.newPageName})
-    //         .then(this.loadPageList())
-    //         .catch(() => alert("Страница уже существует!"));
-    // }
-
-    // deletePage(page) {
-    //     axios
-    //         .post('./api/deletePage.php', {"name": page})
-    //         .then(this.loadPageList())
-    //         .catch(() => alert("Страница не существует!"));
-    // }
-
     isLoading() {
         this.setState({
             loading: true
@@ -166,8 +152,6 @@ export default class Editor extends Component {
         const modal = true;
         let spinner;
 
-        console.log(backupsList);
-
         loading ? spinner = <Spinner active/> : spinner = <Spinner />
 
         return (
@@ -181,6 +165,7 @@ export default class Editor extends Component {
                 <ConfirmModal modal={modal} target={'modal-save'} method={this.save}/>
                 <ChooseModal modal={modal} target={'modal-open'} data={pageList} redirect={this.init}/>
                 <ChooseModal modal={modal} target={'modal-backup'} data={backupsList} redirect={this.restoreBackup}/>
+                {this.virtualDom ? <EditorMeta modal={modal} target={'modal-meta'} virtualDom={this.virtualDom}/> : false}
            </>
         )
     }

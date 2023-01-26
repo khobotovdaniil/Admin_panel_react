@@ -1,4 +1,4 @@
-import React from "react";
+import React from 'react';
 
 const ChooseModal = ({modal, target, data, redirect}) => {
 
@@ -6,22 +6,23 @@ const ChooseModal = ({modal, target, data, redirect}) => {
         if (item.time) {
             return (
                 <li key={item.file}>
-                    <a
-                        className="uk-link-muted uk-modal-close"
+                    <a 
+                        className="uk-link-muted uk-modal-close" 
                         href="#"
-                        onClick={e => redirect(e, item.file)}>Резервная копия от {item.time}</a>
+                        onClick={(e) => redirect(e, item.file)}>Резервная копия от {item.time}</a>
                 </li>
             )
         } else {
             return (
                 <li key={item}>
-                    <a
-                        className="uk-link-muted uk-modal-close"
+                    <a 
+                        className="uk-link-muted uk-modal-close" 
                         href="#"
-                        onClick={e => redirect(e, item)}>{item}</a>
+                        onClick={(e) => redirect(e, item)}>{item}</a>
                 </li>
             )
         }
+
     });
 
     let message;
@@ -38,9 +39,7 @@ const ChooseModal = ({modal, target, data, redirect}) => {
                     {list}
                 </ul>
                 <p className="uk-text-right">
-                    <button 
-                        className="uk-button uk-button-default uk-modal-close uk-modal-close"
-                        type="button">Отменить</button>
+                    <button className="uk-button uk-button-default uk-modal-close" type="button">Отменить</button>
                 </p>
             </div>
         </div>

@@ -17,18 +17,18 @@ export default class EditorText {
     }
 
     onKeypress(e) {
-        if (e.keyCode === 13) {
+        if(e.keyCode === 13) {
             this.element.blur();
         }
     }
 
     onClick() {
-        this.element.contentEditable = 'true';
+        this.element.contentEditable = "true";
         this.element.focus();
     }
 
     onBlur() {
-        this.element.removeAttribute("contentEditable");
+        this.element.removeAttribute('contenteditable');
     }
 
     onTextEdit() {
