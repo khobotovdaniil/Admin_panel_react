@@ -11,6 +11,7 @@ import ConfirmModal from "../confirm-modal";
 import ChooseModal from "../choose-modal";
 import Panel from "../panel";
 import EditorMeta from "../editor-meta";
+import EditorImages from "../editor-images";
 
 export default class Editor extends Component {
     constructor() {
@@ -52,6 +53,7 @@ export default class Editor extends Component {
             .get(`../${page}?rnd=${Math.random()}`)
             .then(res => DOMHelper.parseStrToDOM(res.data))
             .then(DOMHelper.wrapTextNodes)
+            .then(DOMHelper.wrapImages)
             .then(dom => {
                 this.virtualDom = dom;
                 return dom;
@@ -74,6 +76,13 @@ export default class Editor extends Component {
 
             new EditorText(element, virtualElement);
         });
+
+        this.iframe.contentDocument.body.querySelectorAll("[editableimgid]").forEach(element => {
+            const id = element.getAttribute("editableimgid");
+            const virtualElement = this.virtualDom.body.querySelector(`[editableimgid="${id}"]`);
+
+            new EditorImages(element, virtualElement);
+        });
     }
 
     injectStyles() {
@@ -87,6 +96,10 @@ export default class Editor extends Component {
                 outline: 3px solid red;
                 outline-offset: 8px;
             }
+            [editableimgid]:hover {
+                outline: 3px solid orange;
+                outline-offset: 8px;
+            }
         `;
         this.iframe.contentDocument.head.appendChild(style);
     }
@@ -95,6 +108,7 @@ export default class Editor extends Component {
         this.isLoading();
         const newDom = this.virtualDom.cloneNode(this.virtualDom);
         DOMHelper.unwrapTextNodes(newDom);
+        DOMHelper.unwrapImages(newDom);
         const html = DOMHelper.serializeDOMToString(newDom);
 
         await axios
@@ -157,6 +171,7 @@ export default class Editor extends Component {
         return (
             <>
                 <iframe src="" frameBorder="0"></iframe>
+                <input id="img-upload" type="file" accept="image/*" style={{display: 'none'}}></input>
                 
                 {spinner}
 
