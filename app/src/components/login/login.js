@@ -18,13 +18,20 @@ export default class Login extends Component {
         const {pass} = this.state;
         const {login, logErr, lengthErr} = this.props;
 
+        const onEnter = (e) => {
+            if (e.key  ===  'Enter') {
+                login(pass);
+            }
+        }
+
         let renderLogErr, renderLengthErr;
 
         logErr ? renderLogErr = <span className="login-error">Введен неправильный пароль</span> : null;
         lengthErr ? renderLengthErr = <span className="login-error">Пароль должен быть длиннее 5 символов</span> : null;
 
         return (
-            <div className="login-container">
+            <div 
+                className="login-container">
                 <div className="login">
                     <h2 className="uk-modal-title uk-text-center">Авторизация</h2>
                     <div className="uk-margin-top uk-text-lead">Пароль:</div>
@@ -35,7 +42,8 @@ export default class Login extends Component {
                         className="uk-input uk-margin-top"
                         placeholder="Пароль"
                         value={pass}
-                        onChange={(e) => this.onPasswordChange(e)}></input>
+                        onChange={(e) => this.onPasswordChange(e)}
+                        onKeyPress={(e) => onEnter(e)}></input>
                     {renderLogErr}
                     {renderLengthErr}
                     <button
