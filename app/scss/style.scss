@@ -58,11 +58,18 @@ iframe {
     height: 100vh;
     background-color: rgba(0,0,0, .5);
     z-index: 2;
+
+    .login {
+        width: 600px;
+        padding: 30px;
+        background-color: #fff;
+        border-radius: 4px;
+    }
+    
+    .login-error {
+        display: block;
+        color: red;
+        margin-top: 10px;
+    }
 }
 
-.login {
-    width: 600px;
-    padding: 30px;
-    background-color: #fff;
-    border-radius: 4px;
-}

@@ -1,5 +1,10 @@
 <?php
-    // $_POST = json_decode(file_get_contents("php://input"), true);
+    session_start();
+    if ($_SESSION["auth"] != true) {
+        header("HTTP/1.0 403 Forbidden");
+        die;
+    }
+
     $file = "../../TeMpPaGe3242.html";
 
     if (file_exists($file)) {
